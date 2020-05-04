@@ -29,7 +29,7 @@ def add_content(data, ip):
         if content.get(file, None) is None:
             content[file] = [ip]
         else:
-            content[file]
+            content[file] += [ip]
     dump_content()
     return
 
