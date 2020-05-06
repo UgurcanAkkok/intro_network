@@ -8,7 +8,7 @@ import json
 import re
 #  from datetime import timedelta
 
-host = socket.gethostname()  # get this pc's host name
+host = ""
 port = 5001
 MAX_BYTES = 65535
 
@@ -45,11 +45,11 @@ def send_msg(MESSAGE, s, ADDRESS):
     s.sendto(bytes(f"{MESSAGE}", "utf-8"), ADDRESS)
 
 
-def recv_udp_msg(sock):
-    MESSAGE, SENDER_HOST = sock.recvfrom(MAX_BYTES)
-    STR_MESSAGE = MESSAGE.decode("utf-8")
-    print(SENDER_HOST, f": {STR_MESSAGE}")
-    return STR_MESSAGE, SENDER_HOST
+#  def recv_udp_msg(sock):
+#      MESSAGE, SENDER_HOST = sock.recvfrom(MAX_BYTES)
+#      STR_MESSAGE = MESSAGE.decode("utf-8")
+#      print(SENDER_HOST, f": {STR_MESSAGE}")
+#      return STR_MESSAGE, SENDER_HOST
 
 
 def send_bc_msg(FILE_LIST, HOSTED_FILES_LIST, RECEIVER):
@@ -93,26 +93,27 @@ def main():
             print("Check the file name")
             continue
 
-
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # defining socket object
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # defining socket object
     s.bind((host, port))
-    print(host)
-    print("Waiting for any incoming connections ... ")
-    msg, addr = recv_udp_msg(s)
-    send_msg(input(str(" ")), s, addr)
+    s.listen()
+    #  msg, addr = recv_udp_msg(s)
+    #  send_msg(input(str(" ")), s, addr)
 
-    ready = True
     # main loop
-    while ready:
+    while True:
         try:
-            print("Waiting for any incoming connections ... ")
-            file_data, downl_addr = recv_udp_msg(s)
-            # filename = input(str("Enter the file's name you want to send: "))
-            file = open(file_data, 'rb')
-            file_data = file.read(1024)
-            send_msg(file_data, s, downl_addr)
-            print(f"File {file_data} is sent to user {downl_addr} at {time.asctime()}.")
-            send_msg(f"{file_data}", s, addr)
+            print("Waiting for any incoming connections at",s.getsockname(),"...")
+            #  file_data, downl_addr = recv_udp_msg(s)
+            #  filename = input(str("Enter the file's name you want to send: "))
+            sc, addrinfo = s.accept()
+            print("We have incoming message from", addrinfo)
+            msg = sc.recv(1024)
+            msg = json.loads(msg)
+            filename = msg["filename"]
+            with open(filename, 'rb') as file:
+                sc.sendfile(file)
+            print(f"File {filename} is sent to user {addrinfo} at {time.ctime()}.")
+            sc.close()
         except Exception as e:
             print(str(e))
             pass
