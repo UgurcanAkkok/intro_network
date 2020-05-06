@@ -51,14 +51,14 @@ def main():
     username = input("Your username:")
     announcer = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     announcer.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-    # defining thread
     WAIT_TIME_SECONDS = 10
     # main loop
     while True:
         try:
             file_list = read_files()
             service_dict = {"username": username, "files": file_list}
-            job = Job(interval=timedelta(seconds=WAIT_TIME_SECONDS), execute=announce, socket=announcer, service_dict=service_dict)
+            job = Job(interval=timedelta(seconds=WAIT_TIME_SECONDS),
+                      execute=announce, socket=announcer, service_dict=service_dict)
             job.start()
 
         except Exception as e:
