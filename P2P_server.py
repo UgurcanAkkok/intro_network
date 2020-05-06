@@ -8,7 +8,13 @@ import re
 
 host = ""
 port = 5001
-MAX_BYTES = 65535
+MAX_BYTES = 1024
+
+
+def log(text):
+    with open("server_log.txt", "a") as f:
+        f.writelines(text)
+    return
 
 
 def divide_into_chunks(file, fileName, directory):
@@ -59,7 +65,7 @@ def main():
 
     print(ls())
     while True:
-        initial_file = input("Which file to host initially?")
+        initial_file = input("Which file to host initially? ")
         initial_file_path = path.join("files", initial_file)
         if path.isfile(initial_file_path):
             divide_into_chunks(initial_file_path, initial_file, "files")
@@ -80,13 +86,14 @@ def main():
                   s.getsockname(), "...")
             sc, addrinfo = s.accept()
             print("We have incoming message from", addrinfo)
-            msg = sc.recv(1024)
+            msg = sc.recv(MAX_BYTES)
             msg = json.loads(msg)
-            filename = msg["filename"]
+            filename = path.join("files", msg["filename"])
             with open(filename, 'rb') as file:
                 sc.sendfile(file)
-            print(
-                f"File {filename} is sent to user {addrinfo} at {time.ctime()}.")
+            log_text = f"File {msg['filename']} is sent to user {addrinfo} at {time.ctime()}."
+            print(f)
+            log(log_text)
             sc.close()
         except Exception as e:
             print(str(e))
