@@ -1,29 +1,44 @@
+import os
+from os import path
+import math
 import socket
-import threading
+#  import threading
 import time
-from datetime import timedelta
+import json
+import re
+#  from datetime import timedelta
 
 host = socket.gethostname()  # get this pc's host name
-port = 8080
+port = 5001
 MAX_BYTES = 65535
 
-class Job(threading.Thread):  # provides parallel functioning method
-    def __init__(self, interval, execute, *args, **kwargs):
-        threading.Thread.__init__(self)
-        self.daemon = False
-        self.stopped = threading.Event()
-        self.interval = interval
-        self.execute = execute
-        self.args = args
-        self.kwargs = kwargs
 
-    def stop(self):
-        self.stopped.set()
-        self.join()
+def divide_into_chunks(file, fileName, directory):
+    if not path.exists(directory):
+        os.makedirs(directory)
+    c = path.getsize(file)
+    CHUNK_SIZE = math.ceil(math.ceil(c) / 5)
+    cnt = 1
+    with open(file, 'rb') as infile:
+        divided_file = infile.read(int(CHUNK_SIZE))
+        while divided_file:
+            name = path.join(directory, fileName.split('.')[0] + "_" + str(cnt))
+            with open(name, 'wb+') as div:
+                div.write(divided_file)
+            cnt += 1
+            divided_file = infile.read(int(CHUNK_SIZE))
 
-    def run(self):
-        while not self.stopped.wait(self.interval.total_seconds()):
-            self.execute(*self.args, **self.kwargs)
+
+def combine_chunks(inp,sourcedir,outputdir):
+    if not path.exists(outputdir):
+        os.makedirs(outputdir)
+    with open(path.join(outputdir, inp), 'wb') as outfile:
+        for i in range(1, 6):
+            with open(path.join(sourcedir, inp + "_" + str(i)), "rb") as infile:
+                outfile.write(infile.read())
+    for i in range(1, 6):
+        if path.exists(inp + "_" + str(i)):
+            os.remove(inp + "_" + str(i))
 
 
 def send_msg(MESSAGE, s, ADDRESS):
@@ -49,7 +64,36 @@ def send_bc_msg(FILE_LIST, HOSTED_FILES_LIST, RECEIVER):
     send_msg(HOSTED_FILES_LIST, RECEIVER)
 
 
+def ls():
+    r = re.compile(r"(.*)_\d+$")
+    all_files = os.listdir("files")
+    print(all_files)
+    files = set()
+    for f in all_files:
+        match = r.match(f)
+        if match is not None:
+            files.add(match.groups()[0])
+        else:
+            files.add(f)
+
+    return files
+
+
 def main():
+
+    print(ls())
+    while True:
+        initial_file = input("Which file to host initially?")
+        initial_file_path = path.join("files",initial_file)
+        if path.isfile(initial_file_path):
+            divide_into_chunks(initial_file_path, initial_file, "files")
+            print("Ready to host",initial_file,".")
+            break
+        else:
+            print("Check the file name")
+            continue
+
+
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # defining socket object
     s.bind((host, port))
     print(host)
