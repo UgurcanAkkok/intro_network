@@ -5,9 +5,9 @@ import time
 import threading
 from datetime import timedelta
 
-localhost = socket.gethostname()
+localhost = ""
 port = 5000
-MAX_BYTES = 65535
+MAX_BYTES = 1024
 content = {}
 
 
@@ -30,7 +30,7 @@ content = {}
 #             self.execute(*self.args, **self.kwargs)
 
 def recv_msg(SENDER, SENDER_HOST):
-    MESSAGE = SENDER.recv(1024)
+    MESSAGE = SENDER.recv(MAX_BYTES)
     STR_MESSAGE = MESSAGE.decode("utf-8")
     print(SENDER_HOST, f": {STR_MESSAGE}")
     return STR_MESSAGE
@@ -71,7 +71,7 @@ def add_content(data, ip):
 
 
 def dump_content():
-    with open("content.json") as f:
+    with open("content.json", "w") as f:
         json.dump(content, f)
     return
 
