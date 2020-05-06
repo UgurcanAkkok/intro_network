@@ -11,24 +11,6 @@ MAX_BYTES = 1024
 content = {}
 
 
-# class Job(threading.Thread): # provides parallel functioning method
-#     def __init__(self, interval, execute, *args, **kwargs):
-#         threading.Thread.__init__(self)
-#         self.daemon = False
-#         self.stopped = threading.Event()
-#         self.interval = interval
-#         self.execute = execute
-#         self.args = args
-#         self.kwargs = kwargs
-#
-#     def stop(self):
-#         self.stopped.set()
-#         self.join()
-#
-#     def run(self):
-#         while not self.stopped.wait(self.interval.total_seconds()):
-#             self.execute(*self.args, **self.kwargs)
-
 def recv_msg(SENDER, SENDER_HOST):
     MESSAGE = SENDER.recv(MAX_BYTES)
     STR_MESSAGE = MESSAGE.decode("utf-8")
@@ -46,7 +28,8 @@ def receive_bc_msg(SENDER, ADDR):  # receive periodic messages
 def check_data_json(data):
     try:
         data["username"]
-        data["files"]
+        if not type(data["files"]) is list:
+            log.error("Incorrect file list type")
     except KeyError as e:
         log.error("Received data has incorrect format")
         log.error(str(e))
@@ -55,7 +38,7 @@ def check_data_json(data):
 
 def print_service(data):
     print(f"user:{data['username']}\nfiles:")
-    print(data["files"])
+    print(f"File list (type is {type(data['files'])}: {data['files']}")
     return
 
 
@@ -65,7 +48,8 @@ def add_content(data, ip):
         if content.get(file, None) is None:
             content[file] = [ip]
         else:
-            content[file] += [ip]
+            if ip not in content[file]:
+                content[file] += [ip]
     dump_content()
     return
 
@@ -82,11 +66,6 @@ def main():
     sock.bind((localhost, port))
     log.info(f"Listening at {sock.getsockname()}.")
     print(f"Listening at {sock.getsockname()}.")
-
-    # WAIT_TIME_SECONDS = 60
-    # job = Job(interval=timedelta(seconds=WAIT_TIME_SECONDS), execute=receive_bc_msg, SENDER=SERVICE_ANNOUNCER,
-    #           ADDR=addr)
-    # job.start()
 
     while True:
         data, addr = sock.recvfrom(MAX_BYTES)

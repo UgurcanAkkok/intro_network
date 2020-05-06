@@ -58,8 +58,7 @@ def read_files():
     # TODO: Make it read only the names of the files 
     # since it will contain the chunks
     filenames = os.listdir("files")  # read all files in the directory
-    filenames_json = json.dumps(filenames)  # convert JSON array.
-    return filenames_json
+    return filenames
 
 
 def main():
@@ -79,13 +78,6 @@ def main():
                 service_dict["files"] = new_file_list
                 job.update(service_dict)
                 job.start()
-
-            # Announce and wait 10 seconds
-            #  announce(announcer, service_dict)
-            #  time.sleep(10)
-            #  job = Job(interval=timedelta(seconds=WAIT_TIME_SECONDS),
-            #            execute=announce, socket=announcer, service_dict=service_dict)
-            #  job.start()
 
         except Exception as e:
             print(str(e))
