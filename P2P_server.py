@@ -34,18 +34,6 @@ def divide_into_chunks(file, fileName, directory):
             divided_file = infile.read(int(CHUNK_SIZE))
 
 
-def combine_chunks(inp, sourcedir, outputdir):
-    if not path.exists(outputdir):
-        os.makedirs(outputdir)
-    with open(path.join(outputdir, inp), 'wb') as outfile:
-        for i in range(1, 6):
-            with open(path.join(sourcedir, inp + "_" + str(i)), "rb") as infile:
-                outfile.write(infile.read())
-    for i in range(1, 6):
-        if path.exists(inp + "_" + str(i)):
-            os.remove(inp + "_" + str(i))
-
-
 def ls():
     r = re.compile(r"(.*)_\d+$")
     all_files = os.listdir("files")

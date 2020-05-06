@@ -1,4 +1,6 @@
+import time
 import os
+from os import path
 import json
 import socket
 
@@ -10,6 +12,18 @@ def log(text):
     with open("download_log.txt", "a") as f:
         f.writelines(text)
     return
+
+
+def combine_chunks(inp, sourcedir, outputdir):
+    if not path.exists(outputdir):
+        os.makedirs(outputdir)
+    with open(path.join(outputdir, inp), 'wb') as outfile:
+        for i in range(1, 6):
+            with open(path.join(sourcedir, inp + "_" + str(i)), "rb") as infile:
+                outfile.write(infile.read())
+    for i in range(1, 6):
+        if path.exists(inp + "_" + str(i)):
+            os.remove(inp + "_" + str(i))
 
 
 def download(chunk, ip):
@@ -30,6 +44,10 @@ def download(chunk, ip):
     except Exception as e:
         print(e)
         successful = False
+    if successful:
+        log(f"File {chunk} is downloaded from the user \
+                {ip} at {time.ctime()}.")
+    sock.close()
     return successful
 
 
@@ -40,6 +58,7 @@ def main():
         content = 0
         with open("content.json", "r") as f:
             content = json.load(f)
+        all_downloaded = True
         for chunk in chunks:
             users = content[chunk]
             downloaded = False
@@ -51,18 +70,13 @@ def main():
                     downloaded = False
                     continue
             if downloaded is False:
+                all_downloaded = False
                 print("CHUNK", chunk,
                       "CAN NOT BE DOWNLOADED FROM ONLINE PEERS")
-
-
-        file_data, addr = sock.recvfrom(MAX_BYTES)
-        file = open(file_data, 'wb')
-        file.write(file_data)
-        file.close()
-        print("File has been received successfully.")
-    #  except Exception as e:
-    #      print(str(e))
-    #      pass
+        if all_downloaded:
+            print("All chunks are successfully downloaded.")
+            print("Assemblying the chunks")
+            combine_chunks(filename, "file", "file")
 
 
 if __name__ == "__main__":
