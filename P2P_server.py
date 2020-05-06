@@ -26,8 +26,7 @@ def divide_into_chunks(file, fileName, directory):
     with open(file, 'rb') as infile:
         divided_file = infile.read(int(CHUNK_SIZE))
         while divided_file:
-            name = path.join(directory, fileName.split('.')
-                             [0] + "_" + str(cnt))
+            name = path.join(directory, fileName + "_" + str(cnt))
             with open(name, 'wb+') as div:
                 div.write(divided_file)
             cnt += 1
@@ -37,7 +36,6 @@ def divide_into_chunks(file, fileName, directory):
 def ls():
     r = re.compile(r"(.*)_\d+$")
     all_files = os.listdir("files")
-    print(all_files)
     files = set()
     for f in all_files:
         match = r.match(f)
@@ -79,8 +77,9 @@ def main():
             filename = path.join("files", msg["filename"])
             with open(filename, 'rb') as file:
                 sc.sendfile(file)
-            log_text = f"File {msg['filename']} is sent to user {addrinfo} at {time.ctime()}."
-            print(f)
+            log_text = "File {} is sent to user {} at {}."\
+                .format(msg["filename"], addrinfo, time.ctime())
+            str.format
             log(log_text)
             sc.close()
         except Exception as e:

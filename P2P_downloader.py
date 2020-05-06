@@ -35,15 +35,17 @@ def download(chunk, ip):
         filename = {"filename": chunk}
         file_msg = json.dumps(filename)
         sock.sendall(bytes(file_msg, "utf-8"))
-        file = os.path.join("file", chunk)
+        file = os.path.join("files", chunk)
         with open(file, "wb") as f:
             buffer = sock.recv(MAX_BYTES)
-            while buffer > 0:
+            while len(buffer) > 0:
                 f.write(buffer)
                 buffer = sock.recv(MAX_BYTES)
     except Exception as e:
         print(e)
         successful = False
+    else:
+        successful = True
     if successful:
         log(f"File {chunk} is downloaded from the user \
                 {ip} at {time.ctime()}.")
@@ -54,7 +56,7 @@ def download(chunk, ip):
 def main():
     while True:
         filename = input("Which file do you want to download? ")
-        chunks = [filename + "_" + str(i) for i in range(1,6)]
+        chunks = [filename + "_" + str(i) for i in range(1, 6)]
         content = 0
         with open("content.json", "r") as f:
             content = json.load(f)
@@ -76,7 +78,7 @@ def main():
         if all_downloaded:
             print("All chunks are successfully downloaded.")
             print("Assemblying the chunks")
-            combine_chunks(filename, "file", "file")
+            combine_chunks(filename, "files", "files")
 
 
 if __name__ == "__main__":

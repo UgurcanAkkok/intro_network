@@ -60,7 +60,7 @@ def read_files():
 
 def main():
     # get files
-    username = input("Your username:")
+    username = input("Your username: ")
     announcer = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     announcer.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
     file_list = read_files()
@@ -79,6 +79,7 @@ def main():
         except Exception as e:
             print(str(e))
             pass
+        time.sleep(10)
 
 
 if __name__ == "__main__":

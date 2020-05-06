@@ -27,8 +27,7 @@ def check_data_json(data):
 
 
 def print_service(data):
-    print(f"user:{data['username']}\nfiles:")
-    print(f"File list (type is {type(data['files'])}: {data['files']}")
+    print(f"user:{data['username']}\nfiles: {data['files']}")
     return
 
 
@@ -51,7 +50,7 @@ def dump_content():
 
 
 def main():
-    log.basicConfig(level=log.INFO)
+    log.basicConfig(level=log.ERROR)
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.bind((localhost, port))
     log.info(f"Listening at {sock.getsockname()}.")
