@@ -1,9 +1,6 @@
 import socket
 import logging as log
 import json
-import time
-import threading
-from datetime import timedelta
 
 localhost = ""
 port = 5000
@@ -16,13 +13,6 @@ def recv_msg(SENDER, SENDER_HOST):
     STR_MESSAGE = MESSAGE.decode("utf-8")
     print(SENDER_HOST, f": {STR_MESSAGE}")
     return STR_MESSAGE
-
-
-def receive_bc_msg(SENDER, ADDR):  # receive periodic messages
-    FILES_LIST = recv_msg(SENDER, ADDR)
-    HOSTED_FILES_LIST = recv_msg(SENDER, ADDR)
-    print(f"{ADDR} sent at {time.ctime()}")
-    return
 
 
 def check_data_json(data):

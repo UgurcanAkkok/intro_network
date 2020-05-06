@@ -1,5 +1,4 @@
 import os
-import glob
 import json
 import socket
 import threading
@@ -55,8 +54,6 @@ def announce(socket, service_dict):
 
 
 def read_files():
-    # TODO: Make it read only the names of the files 
-    # since it will contain the chunks
     filenames = os.listdir("files")  # read all files in the directory
     return filenames
 
