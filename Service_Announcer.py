@@ -32,7 +32,7 @@ class Job(threading.Thread):
 
 class AnnouncerJob(Job):
     def __init__(self, announcer, service_dict):
-        Job.__init__(self, timedelta(seconds=10), execute=announce,
+        Job.__init__(self, timedelta(seconds=60), execute=announce,
                      socket=announcer, service_dict=service_dict)
         self.service_dict = service_dict
         self.announcer = announcer

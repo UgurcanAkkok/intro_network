@@ -8,12 +8,6 @@ MAX_BYTES = 1024
 content = {}
 
 
-def recv_msg(SENDER, SENDER_HOST):
-    MESSAGE = SENDER.recv(MAX_BYTES)
-    STR_MESSAGE = MESSAGE.decode("utf-8")
-    print(SENDER_HOST, f": {STR_MESSAGE}")
-    return STR_MESSAGE
-
 
 def check_data_json(data):
     try:

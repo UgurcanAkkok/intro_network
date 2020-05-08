@@ -5,6 +5,7 @@ import socket
 import time
 import json
 import re
+from tqdm import tqdm
 
 host = ""
 port = 5001
@@ -23,14 +24,17 @@ def divide_into_chunks(file, fileName, directory):
     c = path.getsize(file)
     CHUNK_SIZE = math.ceil(math.ceil(c) / 5)
     cnt = 1
+    # fileName, ext = path.splitext(fileName) # if ext to be seperated.
     with open(file, 'rb') as infile:
         divided_file = infile.read(int(CHUNK_SIZE))
         while divided_file:
-            name = path.join(directory, fileName + "_" + str(cnt))
-            with open(name, 'wb+') as div:
-                div.write(divided_file)
-            cnt += 1
-            divided_file = infile.read(int(CHUNK_SIZE))
+            for i in tqdm(range(5)):
+                name = path.join(directory, fileName + "_" + str(cnt))
+                with open(name, 'wb+') as div:
+                    div.write(divided_file)
+                cnt += 1
+                divided_file = infile.read(int(CHUNK_SIZE))
+
 
 
 def ls():
@@ -48,7 +52,6 @@ def ls():
 
 
 def main():
-
     print(ls())
     while True:
         initial_file = input("Which file to host initially? ")
@@ -71,20 +74,21 @@ def main():
             print("Waiting for any incoming connections at",
                   s.getsockname(), "...")
             sc, addrinfo = s.accept()
+            # for i in tqdm(range(5)):
             print("We have incoming message from", addrinfo)
             msg = sc.recv(MAX_BYTES)
             msg = json.loads(msg)
             filename = path.join("files", msg["filename"])
             with open(filename, 'rb') as file:
                 sc.sendfile(file)
-            log_text = "File {} is sent to user {} at {}."\
-                .format(msg["filename"], addrinfo, time.ctime())
-            str.format
-            log(log_text)
-            sc.close()
+                log_text = "File {} is sent to user {} at {}." \
+                    .format(msg["filename"], addrinfo, time.ctime())
+                str.format
+                log(log_text)
         except Exception as e:
             print(str(e))
             pass
+        sc.close()
 
 
 if __name__ == "__main__":
