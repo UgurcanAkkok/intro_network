@@ -81,6 +81,7 @@ def main():
                         print("\n CHUNK", chunk,
                               "CAN NOT BE DOWNLOADED FROM ONLINE PEERS")
                 else:
+                    t.clear()
                     print("\nNo such chunk we could find")
                     all_downloaded = False
                     break
