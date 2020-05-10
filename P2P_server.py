@@ -2,10 +2,11 @@ import os
 from os import path
 import math
 import socket
-import time
 import json
 import re
 from tqdm import tqdm
+import time
+
 
 host = ""
 port = 5001
@@ -28,14 +29,15 @@ def divide_into_chunks(file, fileName, directory):
     with open(file, 'rb') as infile:
         divided_file = infile.read(int(CHUNK_SIZE))
         while divided_file:
-            for i in tqdm(range(5)):
+            t = tqdm(total=5)
+            for i in range(5):
+                t.set_description("Preparing (file %s)" % fileName)
                 name = path.join(directory, fileName + "_" + str(cnt))
                 with open(name, 'wb+') as div:
                     div.write(divided_file)
                 cnt += 1
                 divided_file = infile.read(int(CHUNK_SIZE))
-
-
+                t.update(1)
 
 def ls():
     r = re.compile(r"(.*)_\d+$")
@@ -51,30 +53,49 @@ def ls():
     return files
 
 
-def main():
-    print(ls())
+def update_chunks(files: set):
+    new_files = ls()
+    if files != new_files:
+        # Ask to update the chunks
+        print("New files detected!")
+        ask_for_file(new_files)
+    return new_files
+
+
+def ask_for_file(file_list):
+    print(file_list)
     while True:
-        initial_file = input("Which file to host initially? ")
-        initial_file_path = path.join("files", initial_file)
-        if path.isfile(initial_file_path):
-            divide_into_chunks(initial_file_path, initial_file, "files")
-            print("Ready to host", initial_file, ".")
+        file = input("Which file to ready for hosting? ")
+        file_path = path.join("files", file)
+        if path.isfile(file_path):
+            divide_into_chunks(file_path, file, "files")
+            print("Ready to host", file, ".")
             break
         else:
-            print("Check the file name")
-            continue
+            ans = input("Cancelling file preparation ok?(yes/no)")
+            if ans == "yes":
+                break
+            else:
+                print("Check the filename..")
+                continue
+    return
 
+
+def main():
+    file_list = ls()
+    ask_for_file(file_list)
     # defining socket object
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind((host, port))
     s.listen()
+    sc = 0
     # main loop
     while True:
         try:
+            file_list = update_chunks(file_list)
             print("Waiting for any incoming connections at",
                   s.getsockname(), "...")
             sc, addrinfo = s.accept()
-            # for i in tqdm(range(5)):
             print("We have incoming message from", addrinfo)
             msg = sc.recv(MAX_BYTES)
             msg = json.loads(msg)
