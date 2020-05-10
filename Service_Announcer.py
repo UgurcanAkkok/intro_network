@@ -65,6 +65,7 @@ def main():
     announcer.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
     file_list = read_files()
     service_dict = {"username": username, "files": file_list}
+    announce(announcer, service_dict)
     job = AnnouncerJob(announcer, service_dict)
     job.start()
     # main loop

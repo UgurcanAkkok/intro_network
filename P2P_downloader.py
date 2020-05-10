@@ -23,6 +23,7 @@ def combine_chunks(inp, sourcedir, outputdir):
     with open(path.join(outputdir, inp), 'wb') as outfile:
         t = tqdm(total=5)
         for i in range(1, 6):
+            t.set_description("Preparing (file %s)" % inp)
             with open(path.join(sourcedir, inp + "_" + str(i)), "rb") as infile:
                 outfile.write(infile.read())
                 t.update(1)
@@ -55,7 +56,6 @@ def download(chunk, ip):
     if successful:
         log(f"File {chunk} is downloaded from the user \
                 {ip} at {time.ctime()}.")
-        print("Downloaded!")
     sock.close()
     return successful
 
@@ -67,8 +67,10 @@ def main():
             chunks = [filename + "_" + str(i) for i in range(1, 6)]
             with open("content.json", "r") as f:
                 content = json.load(f)
+            print(content)
             all_downloaded = True
             t = tqdm(total=5)
+            t.set_description("Downloading (file %s)" % filename)
             for chunk in chunks:
                 if chunk in content:
                     users = content[chunk]
@@ -84,20 +86,18 @@ def main():
                     if downloaded is False:
                         t.close()
                         all_downloaded = False
-                        tqdm.write("\n CHUNK", chunk,
-                                   "CAN NOT BE DOWNLOADED FROM ONLINE PEERS (err1002)")
+                        t.write("\n CHUNK %s CAN NOT BE DOWNLOADED FROM ONLINE PEERS (err1002)" % chunk)
                 else:
                     t.close()
-                    tqdm.write("\n CHUNK", chunk,
-                               "CAN NOT BE DOWNLOADED FROM ONLINE PEERS (err1001)")
+                    t.write("\n CHUNK %s CAN NOT BE DOWNLOADED FROM ONLINE PEERS" % chunk)
                     all_downloaded = False
                     break
             if all_downloaded:
                 t.close()
-                tqdm.write("\nAll chunks are successfully downloaded.")
+                # tqdm.write("\nAll chunks are successfully downloaded.")
                 combine_chunks(filename, "downloads", "downloads")
         except Exception as e:
-            print("\n", str(e))
+            print("\n", e)
             pass
 
 

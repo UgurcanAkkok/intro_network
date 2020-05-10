@@ -2,10 +2,11 @@ import os
 from os import path
 import math
 import socket
-import time
 import json
 import re
 from tqdm import tqdm
+import time
+
 
 host = ""
 port = 5001
@@ -28,14 +29,15 @@ def divide_into_chunks(file, fileName, directory):
     with open(file, 'rb') as infile:
         divided_file = infile.read(int(CHUNK_SIZE))
         while divided_file:
-            for i in tqdm(range(5)):
+            t = tqdm(total=5)
+            for i in range(5):
+                t.set_description("Preparing (file %s)" % fileName)
                 name = path.join(directory, fileName + "_" + str(cnt))
                 with open(name, 'wb+') as div:
                     div.write(divided_file)
                 cnt += 1
                 divided_file = infile.read(int(CHUNK_SIZE))
-
-
+                t.update(1)
 
 def ls():
     r = re.compile(r"(.*)_\d+$")
@@ -54,9 +56,11 @@ def ls():
 def update_chunks(files: set):
     new_files = ls()
     if files != new_files:
-        #Ask to update the chunks
+        # Ask to update the chunks
+        print("New files detected!")
         ask_for_file(new_files)
     return new_files
+
 
 def ask_for_file(file_list):
     print(file_list)
@@ -92,7 +96,6 @@ def main():
             print("Waiting for any incoming connections at",
                   s.getsockname(), "...")
             sc, addrinfo = s.accept()
-            # for i in tqdm(range(5)):
             print("We have incoming message from", addrinfo)
             msg = sc.recv(MAX_BYTES)
             msg = json.loads(msg)
@@ -106,7 +109,7 @@ def main():
         except Exception as e:
             print(str(e))
             pass
-    sc.close()
+        sc.close()
 
 
 if __name__ == "__main__":
