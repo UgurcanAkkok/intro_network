@@ -55,6 +55,7 @@ def download(chunk, ip):
     if successful:
         log(f"File {chunk} is downloaded from the user \
                 {ip} at {time.ctime()}.")
+        print("Downloaded!")
     sock.close()
     return successful
 
@@ -84,10 +85,11 @@ def main():
                         t.close()
                         all_downloaded = False
                         tqdm.write("\n CHUNK", chunk,
-                                   "CAN NOT BE DOWNLOADED FROM ONLINE PEERS")
+                                   "CAN NOT BE DOWNLOADED FROM ONLINE PEERS (err1002)")
                 else:
                     t.close()
-                    tqdm.write("\nNo such chunk we could find")
+                    tqdm.write("\n CHUNK", chunk,
+                               "CAN NOT BE DOWNLOADED FROM ONLINE PEERS (err1001)")
                     all_downloaded = False
                     break
             if all_downloaded:
