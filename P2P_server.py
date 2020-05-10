@@ -1,3 +1,9 @@
+# Copyright (c) 2020
+# Yusuf Baran Tanrıverdi, Uğurcan Akkök
+# Bahcesehir University.
+#
+# All rights reserved.
+
 import os
 from os import path
 import math
