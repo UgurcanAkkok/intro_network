@@ -1,3 +1,10 @@
+# Copyright (c) 2020
+# Yusuf Baran Tanrıverdi, Uğurcan Akkök
+# Bahcesehir University.
+#
+# All rights reserved.
+
+
 import socket
 import logging as log
 import json

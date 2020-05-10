@@ -1,3 +1,10 @@
+# Copyright (c) 2020
+# Yusuf Baran Tanrıverdi, Uğurcan Akkök
+# Bahcesehir University.
+#
+# All rights reserved.
+
+
 import time
 import os
 from os import path
@@ -82,7 +89,6 @@ def main():
                             break
                         else:
                             downloaded = False
-                            continue
                     if downloaded is False:
                         t.close()
                         all_downloaded = False
