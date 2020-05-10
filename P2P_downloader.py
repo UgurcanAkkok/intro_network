@@ -5,9 +5,9 @@ import json
 import socket
 from tqdm import tqdm
 
-
-MAX_BYTES = 1024
+MAX_BYTES = 65535
 port = 5001
+
 
 def log(text):
     with open("download_log.txt", "a") as f:
@@ -21,13 +21,17 @@ def combine_chunks(inp, sourcedir, outputdir):
         os.makedirs(outputdir)
 
     with open(path.join(outputdir, inp), 'wb') as outfile:
-        for i in tqdm(range(1, 6)):
+        t = tqdm(total=5)
+        for i in range(1, 6):
             with open(path.join(sourcedir, inp + "_" + str(i)), "rb") as infile:
                 outfile.write(infile.read())
+                t.update(1)
+        t.close()
     for i in range(1, 6):
         if path.exists(inp + "_" + str(i)):
             os.remove(inp + "_" + str(i))
     tqdm.write("\nFile is ready!")
+
 
 def download(chunk, ip):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -37,7 +41,7 @@ def download(chunk, ip):
         filename = {"filename": chunk}
         file_msg = json.dumps(filename)
         sock.sendall(bytes(file_msg, "utf-8"))
-        file = os.path.join("files", chunk)
+        file = os.path.join("downloads", chunk)
         with open(file, "wb") as f:
             buffer = sock.recv(MAX_BYTES)
             while len(buffer) > 0:
@@ -77,18 +81,19 @@ def main():
                             downloaded = False
                             continue
                     if downloaded is False:
+                        t.close()
                         all_downloaded = False
-                        print("\n CHUNK", chunk,
-                              "CAN NOT BE DOWNLOADED FROM ONLINE PEERS")
+                        tqdm.write("\n CHUNK", chunk,
+                                   "CAN NOT BE DOWNLOADED FROM ONLINE PEERS")
                 else:
-                    t.clear()
-                    print("\nNo such chunk we could find")
+                    t.close()
+                    tqdm.write("\nNo such chunk we could find")
                     all_downloaded = False
                     break
             if all_downloaded:
-                # t.clear()
-                print("\nAll chunks are successfully downloaded.")
-                combine_chunks(filename, "files", "files")
+                t.close()
+                tqdm.write("\nAll chunks are successfully downloaded.")
+                combine_chunks(filename, "downloads", "downloads")
         except Exception as e:
             print("\n", str(e))
             pass
