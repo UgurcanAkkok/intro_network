@@ -49,7 +49,7 @@ def download(chunk, ip):
         filename = {"filename": chunk}
         file_msg = json.dumps(filename)
         sock.sendall(bytes(file_msg, "utf-8"))
-        file = os.path.join("downloads", chunk)
+        file = os.path.join("temp", chunk)
         with open(file, "wb") as f:
             buffer = sock.recv(MAX_BYTES)
             while len(buffer) > 0:
@@ -74,7 +74,6 @@ def main():
             chunks = [filename + "_" + str(i) for i in range(1, 6)]
             with open("content.json", "r") as f:
                 content = json.load(f)
-            print(content)
             all_downloaded = True
             t = tqdm(total=5)
             t.set_description("Downloading (file %s)" % filename)
@@ -101,7 +100,7 @@ def main():
             if all_downloaded:
                 t.close()
                 # tqdm.write("\nAll chunks are successfully downloaded.")
-                combine_chunks(filename, "downloads", "downloads")
+                combine_chunks(filename, "temp", "downloads")
         except Exception as e:
             print("\n", e)
             pass
