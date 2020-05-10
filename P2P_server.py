@@ -51,26 +51,44 @@ def ls():
     return files
 
 
-def main():
-    print(ls())
+def update_chunks(files: set):
+    new_files = ls()
+    if files != new_files:
+        #Ask to update the chunks
+        ask_for_file(new_files)
+    return new_files
+
+def ask_for_file(file_list):
+    print(file_list)
     while True:
-        initial_file = input("Which file to host initially? ")
-        initial_file_path = path.join("files", initial_file)
-        if path.isfile(initial_file_path):
-            divide_into_chunks(initial_file_path, initial_file, "files")
-            print("Ready to host", initial_file, ".")
+        file = input("Which file to ready for hosting? ")
+        file_path = path.join("files", file)
+        if path.isfile(file_path):
+            divide_into_chunks(file_path, file, "files")
+            print("Ready to host", file, ".")
             break
         else:
-            print("Check the file name")
-            continue
+            ans = input("Cancelling file preparation ok?(yes/no)")
+            if ans == "yes":
+                break
+            else:
+                print("Check the filename..")
+                continue
+    return
 
+
+def main():
+    file_list = ls()
+    ask_for_file(file_list)
     # defining socket object
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind((host, port))
     s.listen()
+    sc = 0
     # main loop
     while True:
         try:
+            file_list = update_chunks(file_list)
             print("Waiting for any incoming connections at",
                   s.getsockname(), "...")
             sc, addrinfo = s.accept()
@@ -88,7 +106,7 @@ def main():
         except Exception as e:
             print(str(e))
             pass
-        sc.close()
+    sc.close()
 
 
 if __name__ == "__main__":
