@@ -74,6 +74,7 @@ def main():
             chunks = [filename + "_" + str(i) for i in range(1, 6)]
             with open("content.json", "r") as f:
                 content = json.load(f)
+            print(content)
             all_downloaded = True
             t = tqdm(total=5)
             t.set_description("Downloading (file %s)" % filename)
@@ -100,7 +101,7 @@ def main():
             if all_downloaded:
                 t.close()
                 # tqdm.write("\nAll chunks are successfully downloaded.")
-                combine_chunks(filename, "temp", "downloads")
+                combine_chunks(filename, "files", "files")
         except Exception as e:
             print("\n", e)
             pass
